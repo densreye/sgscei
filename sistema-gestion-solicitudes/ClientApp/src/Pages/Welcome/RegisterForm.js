@@ -13,9 +13,13 @@ import banner from "../../assets/banner.jpg";
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import SnackbarComponent from "../../components/Snackbar";
 import { API_URL } from "../../Utils/Variables";
+import { useNavigate } from 'react-router-dom';
+
 
 
 const RegisterPage = () => {
+    const navigate = useNavigate();
+            
 
     const [message, setMessage] = useState("");
     const [severity, setSeverity] = useState("");
@@ -41,10 +45,12 @@ const RegisterPage = () => {
             Cedula: values.cedula,
             Username: values.username,
             Correo: values.correo,
-            ContrasenaHash: null,
+            ContrasenaHash: values.contrasena,
             Estado: true,
 
         })
+
+        console.log("data user before register: ",dataRegistro);
 
         console.log(dataRegistro);
         let res = await fetch(API_URL + "/Register", {
@@ -57,6 +63,10 @@ const RegisterPage = () => {
             setSeverity('success');
             setOpen(true);
             resetForm({});
+
+            setTimeout(()=>{
+                navigate('/welcome');
+            },3000)
         }
         else {
             setMessage('Error al crear usuario')
@@ -126,6 +136,12 @@ const RegisterPage = () => {
             }}>
                 <Grid sx={{ gridArea: 'header', bgcolor: 'primary.main' }}>
                     <AppBar position="static">
+                    <Button 
+                        color="inherit" 
+                        sx={{ marginLeft: 'auto' }} // Esto empuja el botón a la derecha
+                    >
+                        Inicio
+                    </Button>
                         <Toolbar sx={{ backgroundColor: '#253260' }}>
                             <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                 <CardMedia
