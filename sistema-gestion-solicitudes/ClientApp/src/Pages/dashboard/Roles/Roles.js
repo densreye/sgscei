@@ -42,10 +42,6 @@ class Roles extends Component {
             .then((response) => response.json())
             .then((data) => {
                 console.log('data: ',data)
-                // for(let i=0;i<data.length;i+=1) {
-                //     let element=data[i]
-                //     element['editar']='editar'
-                // }
                 this.setState({
                     listaRoles: data,
                     loading: false,

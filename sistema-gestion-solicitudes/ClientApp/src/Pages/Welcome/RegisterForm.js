@@ -73,7 +73,10 @@ const RegisterPage = () => {
             setSeverity('error');
             setOpen(true);
 
-
+            res.json().then((value)=>{
+                console.log('value: ',value)
+            })
+            
         }
 
 

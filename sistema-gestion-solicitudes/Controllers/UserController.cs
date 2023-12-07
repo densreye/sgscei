@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using sistema_gestion_solicitudes.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Text;
+using System.Security.Cryptography;
+
 
 namespace sistema_gestion_solicitudes.Controllers
 {
@@ -10,10 +13,12 @@ namespace sistema_gestion_solicitudes.Controllers
     {
 
         private readonly GestionContext DBContext;
+        private readonly ILogger<UserController> logger;
 
-        public UserController(GestionContext DBContext)
+        public UserController(GestionContext DBContext, ILogger<UserController> logger)
         {
             this.DBContext = DBContext;
+            this.logger=logger;
         }
         [HttpGet]
 
@@ -69,20 +74,131 @@ namespace sistema_gestion_solicitudes.Controllers
         [Route("/api/Register")]
         public async Task<IActionResult> PostUser(User usuario)
         {
-            if (!ModelState.IsValid || await DBContext.Users.AnyAsync(x => x.Correo  == usuario.Correo || x.Username == usuario.Username))
+            try
             {
-                return BadRequest();
-            }
-            else
-            {
-                usuario.FechaCreacion = DateTime.Now;
-                DBContext.Users.Add(usuario);
-                DBContext.SaveChanges();
-                return Ok();
 
+                if (!ModelState.IsValid || await DBContext.Users.AnyAsync(x => x.Correo == usuario.Correo || x.Username == usuario.Username || x.Cedula == usuario.Cedula))
+                {
+                    return BadRequest();
+                }
+                else
+                {
+                    this.logger.LogWarning(usuario.ContrasenaHash);
+                    if (usuario.ContrasenaHash != null)
+                    {
+                        usuario.ContrasenaHash = HashPassword(usuario.ContrasenaHash);
+                    }
+
+
+                    usuario.FechaCreacion = DateTime.Now;
+                    DBContext.Users.Add(usuario);
+                    DBContext.SaveChanges();
+                    return Ok();
+
+                }
+            }
+            catch (DbUpdateException ex)
+            {
+                // Log the detailed error
+                this.logger.LogError("An error occurred while updating the database.", ex);
+                // Devuelve una respuesta con el error
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = ex.InnerException?.Message ?? ex.Message });
             }
 
         }
+
+        [HttpPut]
+        [Route("/api/User/{id}")]
+        public async Task<IActionResult> PutSolicitud(int id, User usuario)
+        {
+            if (id != usuario.Id)
+            {
+                return BadRequest();
+            }
+
+            var usuarioExistente = await DBContext.Users.FirstOrDefaultAsync(u => u.Id == id);
+            if (usuarioExistente == null)
+            {
+                return NotFound();
+            }
+
+            usuarioExistente.Nombres = usuario.Nombres;
+            usuarioExistente.Apellidos = usuario.Apellidos;
+            usuarioExistente.Username = usuario.Username;
+            usuarioExistente.Correo = usuario.Correo;
+            usuarioExistente.Cedula = usuario.Cedula;
+            usuarioExistente.Estado = usuario.Estado;
+
+            try
+            {
+                await DBContext.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                // Log the detailed error
+                this.logger.LogError("An error occurred while updating the database.", ex);
+                // Devuelve una respuesta con el error
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = ex.InnerException?.Message ?? ex.Message });
+            }
+            return Ok();
+        }
+
+
+        private bool UserExists(int id)
+        {
+            return (DBContext.Users?.Any(e => e.Id == id)).GetValueOrDefault();
+        }
+
+        public class LoginRequest
+        {
+            public string Username { get; set; }
+            public string Correo { get; set; }
+            public string ContrasenaHash { get; set; }
+        }
+
+        [HttpPost]
+        [Route("api/login")]
+        public async Task<IActionResult> LoginUser(LoginRequest loginRequest)
+        {
+            if (loginRequest.Correo != null && loginRequest.ContrasenaHash != null)
+            {
+                loginRequest.ContrasenaHash = HashPassword(loginRequest.ContrasenaHash);
+
+                // Obtener el usuario y sus roles por correo electrónico
+                var user = await DBContext.Users
+                                          .Include(u => u.Roles) // Incluir los roles del usuario en la consulta
+                                          .FirstOrDefaultAsync(u => u.Correo == loginRequest.Correo &&
+                                                                    u.ContrasenaHash == loginRequest.ContrasenaHash);
+
+                // Si el usuario no existe o la contraseña no coincide, devolver un error
+                if (user == null)
+                {
+                    return BadRequest("Credenciales inválidas.");
+                }
+
+                // Verificar si el usuario tiene el rol de "usuario externo"
+                var hasExternalUserRole = user.Roles.Any(r => r.Nombre == "Usuario Externo");
+                if (!hasExternalUserRole)
+                {
+                    return BadRequest("El usuario no tiene el rol de usuario externo.");
+                }
+
+                // El usuario tiene credenciales válidas y es un usuario externo, proceder a devolver la respuesta de éxito
+                var result = new
+                {
+                    Success = true,
+                    Message = "Usuario autenticado con éxito como usuario externo."
+                };
+
+                return Ok(result); // Retornar el objeto como JSON
+            }
+            else
+            {
+                return BadRequest("Correo y contraseña son requeridos.");
+            }
+        }
+
+
 
 
         [HttpPost]
@@ -143,7 +259,22 @@ namespace sistema_gestion_solicitudes.Controllers
 
         }
 
+        public static string HashPassword(string password)
+        {
+            using (SHA256 sha256 = SHA256.Create())
+            {
+                // ComputeHash - returns byte array  
+                byte[] bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
 
+                // Convert byte array to a string   
+                StringBuilder builder = new StringBuilder();
+                for (int i = 0; i < bytes.Length; i++)
+                {
+                    builder.Append(bytes[i].ToString("x2"));
+                }
+                return builder.ToString();
+            }
+        }
 
 
     }

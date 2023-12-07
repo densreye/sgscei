@@ -2,10 +2,12 @@
 import {
     Typography, ListItem, List
 } from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
 import Tabla from "../../../components/Table/Tabla";
 import { ButtonStyled } from "../../../Utils/CustomStyles";
 import UsersActions from "./UserActions";
 import AddUser from "./AddUserForm";
+import EditUser from "./EditUser";
 import SnackBar from "../../../components/Snackbar";
 import { API_URL } from "../../../Utils/Variables";
 
@@ -61,6 +63,14 @@ class Usuario extends Component {
         })
     };
 
+    handleEditClick = (rowData) => {
+        // Aquí puedes establecer cualquier otro estado necesario antes de abrir el modal
+        this.setState({
+            selectedRow: rowData, // Guarda los datos de la fila seleccionada
+            dialogEditOpen: true, // Abre el modal de edición
+        });
+    };
+
     handleShowSnackBar = (success, message) => {
         if (success) {
             this.setState({
@@ -93,6 +103,16 @@ class Usuario extends Component {
 
 
     render() {
+
+        const editColumn = {
+            field: 'editar',
+            headerName: 'Editar',
+            type: 'string',
+            width: 200,
+            renderCell: (params) => (
+                <EditIcon onClick={() => this.handleEditClick(params.row)} />
+            ),
+        };
 
         return (
             <>
@@ -198,38 +218,18 @@ class Usuario extends Component {
 
                                 },
                                 {
-                                    field: "state",
+                                    field: "estado",
                                     headerName: "Estado",
+                                    align: 'center',
                                     type: "boolean",
-                                    headerAlign: 'center',
+                                    width: 150,
                                     renderCell: (params) => {
                                         return (
-                                            <>
-                                                {params.row.estado ?
-                                                    'Activo'
-                                                    : 'Inactivo'
-
-                                                }
-                                            </>
-
-                                        );
+                                            <UsersActions parametros={params.row} snackBar={this.handleShowSnackBar} handleClose={this.handleCloseCreate} />
+                                        );  
                                     },
-                                    width: 180,
-
                                 },
-                                {
-                                    field: "Acción",
-                                    headerName: "Acción",
-                                    headerAlign: 'center',
-                                    renderCell: (params) => {
-                                        return (
-                                            <UsersActions {...{ params }} />
-
-                                        );
-                                    },
-                                    width: 80,
-
-                                }
+                                editColumn
 
                             ] }
 
@@ -237,7 +237,13 @@ class Usuario extends Component {
                             data={this.state.listaUsuarios} type={"Usuario"} />
                     </>
 
-
+                    <EditUser
+                        open={this.state.dialogEditOpen}
+                        handleClose={() => this.setState({ dialogEditOpen: false })}
+                        // Aquí pasarías los datos de la fila seleccionada al modal, que podrías tener guardados en el estado.
+                        data={this.state.selectedRow}
+                        handleSnackBar={this.handleShowSnackBar}
+                    />
                     <AddUser open={this.state.isCreateModalOpen}  handleClose={this.handleModelClose} handleSnackBar={this.handleShowSnackBar} />
 
                     <SnackBar message={this.state.messageInfo} open={this.state.openSnackbar} severity={this.state.severity} onClose={this.handleCloseSnackBar} />

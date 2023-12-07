@@ -9,21 +9,73 @@ import { Formik, Form } from "formik";
 import * as yup from "yup";
 import banner from "../../assets/banner.jpg";
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import { Snackbar, Alert } from "@mui/material";
+import { useNavigate } from 'react-router-dom';
+
+import { API_URL } from "../../Utils/Variables";
 
 const LoginPage = () => {
+
+    const navigate = useNavigate();
 
     const initialValues = {
         correo: "",
         contrasena: "",
 
+
     };
 
+    const [openSnackbar, setOpenSnackbar] = useState(false);
+    const [alertMessage, setAlertMessage] = useState('');
+    const [alertSeverity, setAlertSeverity] = useState('success'); // Puede ser 'success' o 'error'
+
+
+    
     const onSubmit = async (values) => {
-        const dataLogin = JSON.stringify({
+
+        let dataObjLogin={
             Correo: values.correo,
             ContrasenaHash: values.contrasena,
-        })
+            username: "",
+        }
+        const dataLogin = JSON.stringify(dataObjLogin)
        
+        let res = await fetch(API_URL + `/User/api/Login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: dataLogin,
+        })
+        
+        
+        console.log('respuesta login: ',res.status)
+        console.log('prueba')
+        let responseContent = await res.text();
+        console.log('respuesta: ',responseContent)
+
+        if (res.status === 200) {
+            console.log('login exitoso')
+            setAlertMessage('Login exitoso!');
+            setAlertSeverity('success');
+            setOpenSnackbar(true);
+            
+            let responseContent = await res.json();
+            console.log('responseContent: ',responseContent)
+
+            dataObjLogin["tipoUsuario"]="Usuario Externo";
+            localStorage.setItem('userData', JSON.stringify(dataObjLogin));
+
+            
+            setTimeout(()=>{
+                navigate('/Usuarios');
+            },3000)
+
+        }
+        else {
+            console.log('login fallido')
+            setAlertMessage('Login fallido, Credenciales inválidas');
+            setAlertSeverity('error');
+            setOpenSnackbar(true);
+        }
        
     }
 
@@ -38,9 +90,6 @@ const LoginPage = () => {
             .max(20)
             .required('Contraseña requerido'),
     });
-
-
-
 
 
     return (
@@ -169,9 +218,28 @@ const LoginPage = () => {
 
             </Box>
 
+            <Snackbar 
+    open={openSnackbar} 
+    autoHideDuration={6000} 
+    onClose={() => setOpenSnackbar(false)}
+    anchorOrigin={{ vertical: 'bottom', horizontal: 'letf' }}
+>
+    <Alert 
+        onClose={() => setOpenSnackbar(false)} 
+        severity={alertSeverity} 
+        sx={{ 
+            width: '100%', 
+            maxWidth: '500px', // Ajusta este valor para cambiar el ancho del Alert
+        }}
+    >
+        {alertMessage}
+    </Alert>
+</Snackbar>
 
 
         </>
+
+        
     )
 }
 

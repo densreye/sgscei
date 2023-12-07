@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import { Route, Routes } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
+
 import ListaSolicitudes from './Pages/dashboard/Solicitudes/Solicitudes';
 import Home from "./Pages/Home"
 import Usuario from './Pages/dashboard/Users/Usuarios';
@@ -20,6 +22,21 @@ import SolicitudControl from './Pages/dashboard/Solicitudes/SolicitudControl';
 import RegisterPage from './Pages/Welcome/RegisterForm';
 import PlazosEntrega from './Pages/dashboard/PlazosEntrega';
 
+
+
+const isAuthenticated = () => {
+  const user = localStorage.getItem('user-espol');
+  if (user) {
+    const userData = JSON.parse(user);
+    return userData.login === true;
+  }
+  return false;
+};
+
+const PrivateRoute = ({ children }) => {
+  return isAuthenticated() ? children : <Navigate to="/Welcome" />;
+};
+
 export default class App extends Component {
   static displayName = App.name;
 
@@ -31,7 +48,7 @@ export default class App extends Component {
               <Route path="/Welcome" element={<LoginPage />} />
               <Route path="/LoginExt" element={<LoginExterno />} />
               <Route path="/Registro" element={<RegisterPage />} />
-              <Route path="/" element={<Home />} >
+              <Route path="/" element={<PrivateRoute><Home /></PrivateRoute>}>
                   <Route path="/Solicitudes" element={<ListaSolicitudes />} />
                   <Route path="/Solicitud/:id" element={<SolicitudControl />} />
                   <Route path="/Usuarios" element={<Usuario />} />

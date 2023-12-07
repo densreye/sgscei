@@ -2,11 +2,13 @@
 import {
     Typography
 } from "@mui/material";
+import EditIcon from '@mui/icons-material/Edit';
 import Tabla from "../../../components/Table/Tabla";
 import { API_URL } from "../../../Utils/Variables";
 import { ButtonStyled } from "../../../Utils/CustomStyles";
 import EspecialidadAction from "./EspecialidadAction";
 import AddEspecialidad from "./AddEspecialidad";
+import EditEspecialidad from "./EditEspecialidad";
 import FormDialog from "../../../components/Dialog/Dialogo";
 import SnackBar from "../../../components/Snackbar";
 
@@ -94,8 +96,26 @@ class Especialidades extends Component {
     };
 
 
+    handleEditClick = (rowData) => {
+        // Aquí puedes establecer cualquier otro estado necesario antes de abrir el modal
+        this.setState({
+            selectedRow: rowData, // Guarda los datos de la fila seleccionada
+            dialogEditOpen: true, // Abre el modal de edición
+        });
+    };
 
     render() {
+
+        const editColumn = {
+            field: 'editar',
+            headerName: 'Editar',
+            type: 'string',
+            width: 200,
+            renderCell: (params) => (
+                <EditIcon onClick={() => this.handleEditClick(params.row)} />
+            ),
+        };
+
         return (
             <>
                 <div className="d-flex flex-column m-3">
@@ -141,11 +161,18 @@ class Especialidades extends Component {
                                     );
                                 },
 
-                                },]}
+                                },editColumn,]}
                             data={this.state.listaEspecialidades}
                         />
                     </>
                 </div>
+                <EditEspecialidad
+                        open={this.state.dialogEditOpen}
+                        handleClose={() => this.setState({ dialogEditOpen: false })}
+                        // Aquí pasarías los datos de la fila seleccionada al modal, que podrías tener guardados en el estado.
+                        data={this.state.selectedRow}
+                        handleSnackBar={this.handleShowSnackBar}
+                    />
                 <AddEspecialidad open={this.state.isCreateModalOpen} handleClose={this.handleModelClose} handleSnackBar={this.handleShowSnackBar} />
 
                 <SnackBar message={this.state.messageInfo} open={this.state.openSnackbar} severity={this.state.severity} onClose={this.handleCloseSnackBar} />
