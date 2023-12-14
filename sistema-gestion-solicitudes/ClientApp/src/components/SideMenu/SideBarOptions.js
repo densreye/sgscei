@@ -7,6 +7,23 @@ import LockPersonIcon from '@mui/icons-material/LockPerson';
 import PsychologyIcon from '@mui/icons-material/Psychology';
 import TimerIcon from '@mui/icons-material/Timer';
 
+import { useState, useEffect } from 'react';
+
+
+const getUserRoles = () => {
+    const user = JSON.parse(localStorage.getItem('userEspol'));
+    let roles= user?.roles; // Asumiendo que el rol está almacenado en la propiedad 'rol'
+    let listRoles=[]
+    for(let i=0;i<roles.length;i++){
+        let role=roles[i]
+        let roleName=role.nombre
+        listRoles.push(roleName)
+    }
+
+    return listRoles
+};
+  
+
 export const SidebarData = [
     {
         id: 1,
@@ -63,14 +80,25 @@ export const SidebarData = [
 ]
 
 
-/*
-
-{
-        id: 3,
-        titulo: 'Consultas',
-        path: '/Consultas',
-        icon: <ArticleIcon sx={{ color: 'white' }} />
-
-    },
-
-*/
+export const useSidebarData = () => {
+    const [sidebarData, setSidebarData] = useState([]);
+  
+    useEffect(() => {
+      const roles = getUserRoles();
+      console.log('roles: ',roles)
+      let filteredData;
+        
+      if (roles.indexOf('Investigador')!=-1) {
+        console.log('IF')
+        // Solo mostrar 'Inicio' y 'Solicitudes' para el rol 'Investigador'
+        filteredData = SidebarData.filter(item => item.titulo === 'Inicio' || item.titulo === 'Solicitudes');
+      } else {
+        // Aquí puedes manejar otros roles y decidir qué mostrar
+        filteredData = SidebarData;
+      }
+  
+      setSidebarData(filteredData);
+    }, []); // Asegúrate de que este efecto se ejecute solo una vez
+  
+    return sidebarData;
+  };

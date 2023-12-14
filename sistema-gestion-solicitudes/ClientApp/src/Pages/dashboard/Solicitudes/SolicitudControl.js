@@ -9,13 +9,13 @@ import SolicitudCEI from './CEI/SolicitudCEI';
 const SolicitudControl = () => {
 
     const params = useParams();
-    const rol = 'solicitante';
+    const rol = {'rol1': 'solicitante','rol2': 'presidente'};
     
     return (
 
         <>
 
-            {rol === 'soicitante' ?
+            {rol['rol2'] === 'solicitante' ?
                 
                     <SolicitudComponent/>
               

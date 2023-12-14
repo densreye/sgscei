@@ -8,7 +8,9 @@ import {
 import classNames from "classnames";
 import { Link } from "react-router-dom";
 import logo from '../../assets/logo.png';
-import { SidebarData } from "./SideBarOptions"
+import { useSidebarData } from "./SideBarOptions"
+
+//const sidebarData = useSidebarData();
 
 
 const SideBar = ({ isOpen }) => (
@@ -47,7 +49,7 @@ const SideBar = ({ isOpen }) => (
             <Divider />
 
             <List>
-                {SidebarData.map((item) => (
+                {useSidebarData().map((item) => (
                     <ListItem key={item.id} component={Link} to={item.path} >
                         <ListItemIcon>{item.icon}</ListItemIcon>
                         <ListItemText

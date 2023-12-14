@@ -25,10 +25,10 @@ import PlazosEntrega from './Pages/dashboard/PlazosEntrega';
 
 
 const isAuthenticated = () => {
-  const user = localStorage.getItem('user-espol');
+  const user = localStorage.getItem('userEspol');
   if (user) {
     const userData = JSON.parse(user);
-    return userData.login === true;
+    return userData.correo != undefined;
   }
   return false;
 };
@@ -47,7 +47,7 @@ export default class App extends Component {
 
               <Route path="/Welcome" element={<LoginPage />} />
               <Route path="/LoginExt" element={<LoginExterno />} />
-              <Route path="/Registro" element={<RegisterPage />} />
+              <Route path="/Registro/:id?" element={<RegisterPage />} />
               <Route path="/" element={<PrivateRoute><Home /></PrivateRoute>}>
                   <Route path="/Solicitudes" element={<ListaSolicitudes />} />
                   <Route path="/Solicitud/:id" element={<SolicitudControl />} />

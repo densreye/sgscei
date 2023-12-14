@@ -115,7 +115,7 @@ const Solicitudes = () => {
 
     useEffect(() => {
 
-        fetch(API_URL + '/SolicitudesByUserId/1')
+        fetch(API_URL + '/SolicitudesByUserId/3')
             .then((response) => response.json())
             .then((data) => {
                 setListaSolicitudes(data);

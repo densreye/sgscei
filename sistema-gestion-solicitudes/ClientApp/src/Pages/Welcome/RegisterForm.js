@@ -43,7 +43,7 @@ const RegisterPage = () => {
             Nombres: values.nombres,
             Apellidos: values.apellidos,
             Cedula: values.cedula,
-            Username: values.username,
+            Username: values.correo,
             Correo: values.correo,
             ContrasenaHash: values.contrasena,
             Estado: true,
@@ -96,9 +96,9 @@ const RegisterPage = () => {
             .required('Campo requerido')
             .matches(/^[0-9]+$/, "Debe ingresar solo numeros")
             .length(10, 'Campo debe contener 10 caracteres'),
-        username: yup
-            .string()
-            .required('Campo requerido'),
+        // username: yup
+        //     .string()
+        //     .required('Campo requerido'),
         correo: yup
             .string()
             .email('Formato de email incorrecto')
@@ -227,18 +227,6 @@ const RegisterPage = () => {
                                                                 target="Forms"
                                                             />
                                                         </Grid>
-                                                        
-                                                    </Grid>
-                                                    <Grid container spacing={2}>
-                                                        <Grid item xs={12} sm={6}>
-                                                            <FormikControl
-                                                                control="input"
-                                                                type="text"
-                                                                label="Username"
-                                                                name="username"
-                                                                target="Forms"
-                                                            />
-                                                        </Grid>
                                                         <Grid item xs={12} sm={6}>
                                                             <FormikControl
                                                                 control="input"
@@ -248,6 +236,18 @@ const RegisterPage = () => {
                                                                 target="Forms"
                                                             />
                                                         </Grid>
+                                                    </Grid>
+                                                    <Grid container spacing={2}>
+                                                        {/* <Grid item xs={12} sm={6}>
+                                                            <FormikControl
+                                                                control="input"
+                                                                type="text"
+                                                                label="Username"
+                                                                name="username"
+                                                                target="Forms"
+                                                            />
+                                                        </Grid> */}
+                                                        
                                                     </Grid>
                                                     <Grid container spacing={2}>
                                                         <Grid item xs={12} sm={6}>

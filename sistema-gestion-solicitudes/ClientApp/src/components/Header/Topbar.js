@@ -3,8 +3,23 @@ import { Button, IconButton } from '@mui/material';
 import Notification from "./NotificationSection/Notification";
 import ProfileUser from "./ProfileSection/ProfileUser";
 import NavComite from './NavComite';
+import { useNavigate } from 'react-router-dom';
 
 const Topbar = ({ toggleSidebar }) => {
+
+    const navigate = useNavigate();
+
+    const handleLogout = () => {
+        // Aquí iría la lógica para cerrar la sesión del usuario
+        localStorage.removeItem('userEspol'); // Suponiendo que así es como guardas la sesión
+    
+        // Mostrar un mensaje de confirmación
+        console.log('Sesión cerrada con éxito');
+        setTimeout(()=>{
+            navigate('/welcome');
+        },2000)        
+        // Aquí podrías usar un sistema de notificaciones o alertas si tienes uno
+      };
 
     return (
         <>
@@ -20,7 +35,7 @@ const Topbar = ({ toggleSidebar }) => {
                             <Notification />
                             <ProfileUser />
 
-                        <Button size="small">
+                        <Button size="small" onClick={handleLogout}>
                                     Cerrar Sesion
                              
                             </Button>
@@ -29,10 +44,6 @@ const Topbar = ({ toggleSidebar }) => {
                 <div className="Comite p-2 rounded">
                     <NavComite />
                 </div>
-
-                       
-                
-            
             </div>
            
         </>

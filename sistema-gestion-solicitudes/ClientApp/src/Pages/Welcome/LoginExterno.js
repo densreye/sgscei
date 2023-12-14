@@ -48,10 +48,7 @@ const LoginPage = () => {
         
         
         console.log('respuesta login: ',res.status)
-        console.log('prueba')
-        let responseContent = await res.text();
-        console.log('respuesta: ',responseContent)
-
+        
         if (res.status === 200) {
             console.log('login exitoso')
             setAlertMessage('Login exitoso!');
@@ -60,13 +57,11 @@ const LoginPage = () => {
             
             let responseContent = await res.json();
             console.log('responseContent: ',responseContent)
-
-            dataObjLogin["tipoUsuario"]="Usuario Externo";
-            localStorage.setItem('userData', JSON.stringify(dataObjLogin));
+            localStorage.setItem('userEspol', JSON.stringify(responseContent));
 
             
             setTimeout(()=>{
-                navigate('/Usuarios');
+                navigate('/solicitudes');
             },3000)
 
         }

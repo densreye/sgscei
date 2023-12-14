@@ -18,9 +18,13 @@ const CreateSolicitud = ({ open, handleClose, handleSnackBar }) => {
 
     const onSubmit = async (values) => {
 
+        const user = localStorage.getItem('userEspol');
+        const objUser= JSON.parse(user)
+
+
         const data = JSON.stringify({
             Titulo: values.titulo,
-            UsuarioId: 1,
+            UsuarioId: objUser.userId,
         })
 
         const response = await fetch(API_URL + "/Solicitud/Create", {
