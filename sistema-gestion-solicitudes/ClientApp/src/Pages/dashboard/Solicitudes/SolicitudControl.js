@@ -15,7 +15,7 @@ const SolicitudControl = () => {
 
         <>
 
-            {rol['rol2'] === 'solicitante' ?
+            {rol['rol1'] === 'solicitante' ?
                 
                     <SolicitudComponent/>
               

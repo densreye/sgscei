@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MySql.EntityFrameworkCore.Extensions;
+using sistema_gestion_solicitudes;
 using sistema_gestion_solicitudes.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,6 +13,8 @@ builder.Services.AddCors(options => options.AddPolicy("TheCodeBuzzPolicy", build
            .AllowAnyMethod()
            .AllowAnyHeader();
 }));
+
+
 
 
 builder.Services.AddEntityFrameworkMySQL().AddDbContext<GestionContext>(options =>
@@ -36,6 +39,9 @@ builder.Services.AddCors(options =>
 builder.Services.AddControllersWithViews();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddTransient<IEmailSender, EmailSender>();
+
 
 var app = builder.Build();
 

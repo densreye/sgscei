@@ -16,6 +16,9 @@ public partial class User
     public int Cedula { get; set; }
     public DateTime FechaCreacion { get; set; }
     public DateTime? FechaUltimoLogin { get; set; }
+
+    public bool IsInvited { get; set; }
+
     public bool Estado { get; set; }
     public virtual ICollection<Role> Roles { get; set; } = new List<Role>();
 

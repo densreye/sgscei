@@ -13,30 +13,107 @@ import banner from "../../assets/banner.jpg";
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import SnackbarComponent from "../../components/Snackbar";
 import { API_URL } from "../../Utils/Variables";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate,useParams } from 'react-router-dom';
+import React from 'react';
 
 
+
+async function  getEmailByCode(code){
+    //make http request
+    let res = await fetch(API_URL + "/getEmailByCode?code="+code, {
+        method: "GET",
+    })
+    console.log('res.status: ',res.status)
+    if (res.status === 200) {
+        let data=await res.text();
+        console.log('data: ',data)
+        return [true,data]
+    }
+    else {
+        return [false,"error"]
+    }
+
+}
 
 const RegisterPage = () => {
-    const navigate = useNavigate();
-            
+    let { code } = useParams();
+    const [correo, setCorreo] = useState("");
+    const [enableDisabled, setEnableDisabled] = useState(false);
+    const formikRef = React.useRef(); // Añade esta línea
 
+
+    const [initialValues, setInitialValues] = useState({
+        nombres: "",
+        apellidos: "",
+        cedula: "",
+        username: "",
+        correo: "", // Este es el valor predeterminado que quieres actualizar
+        contrasena: "",
+        confirmacion: "",
+      });
+
+
+    const navigate = useNavigate();
+    
+    useEffect(() => {
+        const fetchData = async () => {
+          if (code) {
+            try {
+              let [success, email] = await getEmailByCode(code);
+              if (success) {
+                setCorreo(email); // Actualiza el estado de correo
+                setEnableDisabled(true); // Actualiza el estado de enableDisabled
+                console.log('Antes de setInitialValues', initialValues);
+
+                setInitialValues(prevValues => ({
+                    ...prevValues,
+                    nombres: "", // Actualiza nombres aquí
+                    correo: email,    // Actualiza correo aquí
+                  }));
+                  console.log('Después de setInitialValues', { nombres: "diego", correo: email });
+                
+                  if (formikRef.current) {
+                    formikRef.current.resetForm({
+                      values: {
+                        ...formikRef.current.initialValues,
+                        nombres: "",
+                        correo: email,
+                      },
+                    });
+                }
+
+              } else {
+                setCorreo(""); // Actualiza el estado de correo
+                setEnableDisabled(false); // Actualiza el estado de enableDisabled
+              }
+            } catch (error) {
+              console.error("Error al obtener el correo: ", error);
+            }
+          }
+        };
+    
+        fetchData();
+      }, [code]); // Dependencias del efecto
+
+      useEffect(() => {
+        // Este efecto se ejecutará cada vez que `correo` se actualice.
+        console.log('correo after: ', correo);
+      }, [correo]);
+    
+        
+    
     const [message, setMessage] = useState("");
     const [severity, setSeverity] = useState("");
     const [open, setOpen] = useState(false);
    
 
-    const initialValues = {
-        nombres: "",
-        apellidos: "",
-        cedula: "",
-        username: "",
-        correo: "",
-        contrasena: "",
-        confirmacion:"",
+    
+      useEffect(() => {
+        console.log('correo after: ', correo);
+        // Actualiza los valores iniciales del formulario con el nuevo correo
+        setInitialValues(currentValues => ({ ...currentValues, correo }));
+      }, [correo]);
 
-
-    };
 
     const onSubmit = async (values, { resetForm }) => {
         const dataRegistro = JSON.stringify({
@@ -47,12 +124,12 @@ const RegisterPage = () => {
             Correo: values.correo,
             ContrasenaHash: values.contrasena,
             Estado: true,
+            IsInvited: enableDisabled
 
         })
 
         console.log("data user before register: ",dataRegistro);
 
-        console.log(dataRegistro);
         let res = await fetch(API_URL + "/Register", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -122,10 +199,6 @@ const RegisterPage = () => {
 
     
 
-
-
-
-
     return (
 
         <>
@@ -190,6 +263,8 @@ const RegisterPage = () => {
                                     initialValues={initialValues}
                                     onSubmit={onSubmit}
                                     validationSchema={validationSchema}
+                                    innerRef={formikRef} // Añade la propiedad innerRef aquí
+
 
 
                                 >
@@ -234,6 +309,8 @@ const RegisterPage = () => {
                                                                 label="Correo Electrónico"
                                                                 name="correo"
                                                                 target="Forms"
+                                                                disabled={enableDisabled}
+                                                                
                                                             />
                                                         </Grid>
                                                     </Grid>

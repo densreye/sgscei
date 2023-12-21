@@ -123,16 +123,13 @@ export default class MetodosFetch {
 
     }
 
-    static createArchivos = async (archivos) => {
+    static createArchivos = async (formData) => {
 
         let response = await fetch(API_URL + "/Archivos/Create", {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(archivos)
+            body: formData
         })
-
         return response;
-
     }
 
 

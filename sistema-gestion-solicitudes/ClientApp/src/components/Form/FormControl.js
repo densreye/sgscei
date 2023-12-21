@@ -9,11 +9,15 @@ import FormikAutocomplete from "./MultiSelect";
 import RadioButton from "./RadioButton";
 
 const FormikControl = (props) => {
-    const { control, ...rest } = props;
+    var { control,disabled, ...rest } = props;
+
+    if(disabled==undefined) {
+        disabled = false;
+    }
 
     switch (control) {
         case "input":
-            return <Input {...rest} />;
+            return <Input disabled={disabled} {...rest} />;
         case "checkbox":
             return <Checkbox {...rest} />;
         case "radiobutton":

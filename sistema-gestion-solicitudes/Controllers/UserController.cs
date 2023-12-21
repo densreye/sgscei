@@ -3,6 +3,8 @@ using sistema_gestion_solicitudes.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
 using System.Security.Cryptography;
+using Microsoft.Extensions.Logging;
+using Castle.Core.Smtp;
 
 
 namespace sistema_gestion_solicitudes.Controllers
@@ -14,11 +16,14 @@ namespace sistema_gestion_solicitudes.Controllers
 
         private readonly GestionContext DBContext;
         private readonly ILogger<UserController> logger;
+        private readonly IEmailSender _emailSender;
 
-        public UserController(GestionContext DBContext, ILogger<UserController> logger)
+
+        public UserController(GestionContext DBContext, ILogger<UserController> logger, IEmailSender emailSender)
         {
             this.DBContext = DBContext;
             this.logger=logger;
+            this._emailSender = emailSender;
         }
         [HttpGet]
 
@@ -38,7 +43,7 @@ namespace sistema_gestion_solicitudes.Controllers
 
         public async Task<ActionResult<IEnumerable<User>>> GetRevisoresDisponibles()
         {
-            var usuarios = await DBContext.Users.Where(s => s.Estado == true && s.Roles.Any(s => s.Nombre =="Miembro del Comité"))
+            var usuarios = await DBContext.Users.Where(s => s.Estado == true && s.Roles.Any(s => s.Nombre =="Miembro del Comite"))
                         .ToListAsync();
 
             return usuarios;
@@ -68,6 +73,37 @@ namespace sistema_gestion_solicitudes.Controllers
             return usuario;
         }
 
+        [HttpGet]
+        [Route("/api/getEmailByCode")]
+        public async Task<IActionResult> getEmailByCode(string code)
+        {
+            if (code == null)
+            {
+                return NotFound();
+            }
+           
+            var invitacionlink = await DBContext.InvitacionLink
+                            .FirstOrDefaultAsync(i => i.code == code);
+            ;
+
+
+            if (invitacionlink == null)
+            {
+                return NotFound();
+            }
+
+            if (invitacionlink.correo == null)
+            {
+                return NotFound();
+            }
+            else
+            {
+                return Ok(invitacionlink.correo);
+            }
+
+            
+        }
+
 
 
         [HttpPost]
@@ -76,10 +112,22 @@ namespace sistema_gestion_solicitudes.Controllers
         {
             try
             {
+                this.logger.LogWarning("is_invited: "+usuario.IsInvited.ToString());
+
+                var comparation = usuario.Correo.Contains("espol.edu.ec");
+
+                this.logger.LogWarning(comparation.ToString());
+                if (usuario.Username == null)
+                {
+                    var username=usuario.Correo.Split('@')[0];
+                    usuario.Username = username;
+                }
 
                 if (!ModelState.IsValid || await DBContext.Users.AnyAsync(x => x.Correo == usuario.Correo || x.Username == usuario.Username || x.Cedula == usuario.Cedula))
                 {
-                    return BadRequest();
+                    return BadRequest("Usuario no válido o ya existe");
+                }else if (usuario.Correo.Contains("espol.edu.ec")){
+                    return BadRequest("Usuario no puede ser de Espol");
                 }
                 else
                 {
@@ -89,6 +137,26 @@ namespace sistema_gestion_solicitudes.Controllers
                         usuario.ContrasenaHash = HashPassword(usuario.ContrasenaHash);
                     }
 
+                    // Asegúrate de que los roles existen en la base de datos.
+                    var rol1 = await DBContext.Roles.FirstOrDefaultAsync(r => r.Nombre == "Usuario Externo");
+                    var rol2 = await DBContext.Roles.FirstOrDefaultAsync(r => r.Nombre == "Investigador");
+                    var rol3 = await DBContext.Roles.FirstOrDefaultAsync(r => r.Nombre == "Miembro del Comite");
+
+                    
+                    if (rol1 != null)
+                    {
+                        usuario.Roles.Add(rol1);
+                    }
+
+                    if (rol2 != null)
+                    {
+                        usuario.Roles.Add(rol2);
+                    }
+
+                    if (usuario.IsInvited == true && rol3 != null)
+                    {
+                        usuario.Roles.Add(rol3);
+                    }
 
                     usuario.FechaCreacion = DateTime.Now;
                     DBContext.Users.Add(usuario);
@@ -187,7 +255,10 @@ namespace sistema_gestion_solicitudes.Controllers
                 var result = new
                 {
                     Success = true,
-                    Message = "Usuario autenticado con éxito como usuario externo."
+                    Message = "Usuario autenticado con éxito como usuario externo.",
+                    UserId = user.Id,
+                    Correo = user.Correo,
+                    Roles = user.Roles
                 };
 
                 return Ok(result); // Retornar el objeto como JSON
@@ -277,6 +348,50 @@ namespace sistema_gestion_solicitudes.Controllers
         }
 
 
+        public class InvitationRequestBody
+        {
+            public string Email { get; set; }
+            public string Mensaje { get; set; }
+        }
+
+        [HttpPost]
+        [Route("/api/NewInvitation")]
+        public async Task<IActionResult> CreateInvitation([FromBody] InvitationRequestBody requestBody)
+
+        {
+
+            Random random = new Random();
+            int randomNumber = random.Next(100000, 1000000); // Esto generará un número entre 100000 y 999999
+            var string_code = randomNumber.ToString();
+            string link = "https://localhost:44448/Registro/" + string_code;
+
+            var nuevaInvitacion = new InvitacionLink
+            {
+                code = string_code,
+                correo = requestBody.Email,
+                FechaCreacion = DateTime.UtcNow, // o DateTime.Now dependiendo de tu zona horaria
+                Estado = true,
+                Link=link
+            };
+
+            DBContext.InvitacionLink.Add(nuevaInvitacion);
+            await DBContext.SaveChangesAsync();
+
+            string subject = "Invitación por revisión de solicitud";
+            string body = requestBody.Mensaje + ". Link de registro: " + link;
+
+
+            await _emailSender.SendEmailAsync(requestBody.Email, subject, body);
+
+            return Ok("Correo enviado");
+        }
+
+
+
+
+
     }
+
+
 }
 

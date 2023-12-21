@@ -5,19 +5,20 @@ import { Box , Typography } from "@mui/material"
 import EmailIcon from '@mui/icons-material/Email';
 import FormikControl from "../../../../components/Form/FormControl";
 import { ButtonStyled, BtnCancel } from "../../../../Utils/CustomStyles";
+import { API_URL } from "../../../../Utils/Variables";
+import { useEffect, useState } from "react";
 
 const InvitationForm = (props) => {
 
     const { openDialog, handleCloseDialog } = props;
 
+    const [message, setMessage] = useState("");
+    const [severity, setSeverity] = useState("");
+    const [open, setOpen] = useState(false);
 
     const initialValues = {
         correo: '',
         mensaje:'',
-    }
-
-    const onSubmit = (value) => {
-        console.log(value)
     }
 
     const validationSchema = yup.object({
@@ -30,6 +31,41 @@ const InvitationForm = (props) => {
             .string()
             .required('Mensaje requerido')
     });
+
+    const onSubmit = async (values, { resetForm }) => {
+        const dataInvitacion = JSON.stringify({
+            Email: values.correo,
+            Mensaje: values.mensaje,
+        })
+
+        console.log("dataInvitacion: ",dataInvitacion);
+
+        let res = await fetch(API_URL + "/NewInvitation", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: dataInvitacion,
+        })
+        if (res.status === 200) {
+            setMessage('Invitacion enviada exitosamente')
+            setSeverity('success');
+            setOpen(true);
+            resetForm({});
+
+        }
+        else {
+            setMessage('Error al enviar invitacion')
+            setSeverity('error');
+            setOpen(true);
+
+            res.json().then((value)=>{
+                console.log('value: ',value)
+            })
+            
+        }
+
+
+    }
+
 
     
 

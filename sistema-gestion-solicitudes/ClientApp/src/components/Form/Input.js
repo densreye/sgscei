@@ -5,13 +5,12 @@ import { Typography, Box, TextField, Container } from "@mui/material"
 
 const Input = (props) => {
     const { label, name, type, target, disabled, ...rest } = props;
-
     return (
         <>
             {target === "Forms" ?
                 <Box sx={{ pb: 2 }}>
                     <Typography variant="subtitle2" htmlFor={name}>{label}</Typography>
-                    <Field as={TextField} id={name} name={name} {...rest} type={type} size="small"/>
+                    <Field as={TextField} id={name} name={name} {...rest} type={type} size="small" disabled={disabled}/>
                     <ErrorMessage name={name} component={TextError} />
                 </Box>
                 :

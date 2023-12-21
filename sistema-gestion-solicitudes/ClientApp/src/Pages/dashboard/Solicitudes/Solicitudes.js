@@ -115,7 +115,11 @@ const Solicitudes = () => {
 
     useEffect(() => {
 
-        fetch(API_URL + '/SolicitudesByUserId/3')
+        var dataStorage=JSON.parse(localStorage.getItem('userEspol'));
+        var idUser=dataStorage['userId'];
+
+
+        fetch(API_URL + '/SolicitudesByUserId/'+idUser)
             .then((response) => response.json())
             .then((data) => {
                 setListaSolicitudes(data);

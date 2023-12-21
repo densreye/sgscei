@@ -60,35 +60,47 @@ const SolicitudIniciada = (props) => {
     }
 
     const handleEnviar = async () => {
-
-        const newFiles = [];
-
-        files.forEach((file) => {
-
-            newFiles.push(
-                {
-                    Nombre: file.name,
-                    solicitudDetalleId: solicitud.solicitudDetalle.id,
-                    URL: '',
-                    Extension: (file.name).split('.').pop(),
-                    UsuarioId: 1,
-                    TipoArchivoId: 1,
-                }
-            )
-
-        })
-
-        console.log(newFiles)
-
-        let response = await MetodosFetch.createArchivos(newFiles)
-        if (response.ok) {
-            setOpenConfirmacion(false);
-            fetchData();
+        const formData = new FormData();
+        console.log(files)
+        for(let i = 0; i < files.length; i++) {
+            let myfile=files[i]
+            formData.append("files",myfile);
+            // Agregar datos adicionales al FormData
+            formData.append('Nombre', myfile.name);
+            formData.append('SolicitudDetalleId', solicitud.solicitudDetalle.id); // Reemplaza con el valor real
+            formData.append('Extension',  myfile.name.split('.').pop()); // Reemplaza con el valor real
+            formData.append('UsuarioId', '4'); // Reemplaza con el valor real
+            formData.append('TipoArchivoId', '1'); // Reemplaza con el valor real
+            
         }
-        else {
 
-        }
         
+
+
+        // files.forEach((file) => {
+        //     // Añadir el archivo al objeto FormData
+        //     formData.append('File', file);
+        //     // Añadir datos adicionales al objeto FormData
+        //     formData.append('Nombre', file.name);
+        //     formData.append('solicitudDetalleId', solicitud.solicitudDetalle.id);
+        //     formData.append('Extension', file.name.split('.').pop());
+        //     formData.append('UsuarioId', '4'); // Suponiendo que '4' es un valor fijo para el ejemplo
+        //     formData.append('TipoArchivoId', '1'); // Suponiendo que '1' es un valor fijo para el ejemplo
+        // });
+
+        try{
+            let response = await MetodosFetch.createArchivos(formData)
+            console.log('response: ',response)
+            if (response.ok) {
+                setOpenConfirmacion(false);
+                fetchData();
+            }
+            else {
+                console.log('Error al subir los archivos');
+            }
+        }catch (error) {
+            console.error('Error al enviar los archivos', error);
+        }
 
     }
 

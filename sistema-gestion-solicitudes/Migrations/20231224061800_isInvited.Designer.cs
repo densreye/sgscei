@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using sistema_gestion_solicitudes.Models;
 
@@ -10,9 +11,11 @@ using sistema_gestion_solicitudes.Models;
 namespace sistema_gestion_solicitudes.Migrations
 {
     [DbContext(typeof(GestionContext))]
-    partial class GestionContextModelSnapshot : ModelSnapshot
+    [Migration("20231224061800_isInvited")]
+    partial class isInvited
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

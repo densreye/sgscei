@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Humanizer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using sistema_gestion_solicitudes.Models;
+using static sistema_gestion_solicitudes.Controllers.ArchivoController;
+
 
 namespace sistema_gestion_solicitudes.Controllers
 {
@@ -14,10 +17,15 @@ namespace sistema_gestion_solicitudes.Controllers
     public class ArchivoController : ControllerBase
     {
         private readonly GestionContext DBContext;
+        private readonly IWebHostEnvironment _hostingEnvironment;
+        private readonly ILogger<ArchivoController> logger;
 
-        public ArchivoController(GestionContext context)
+
+        public ArchivoController(IWebHostEnvironment hostingEnvironment, GestionContext context, ILogger<ArchivoController> logger)
         {
             DBContext = context;
+            _hostingEnvironment = hostingEnvironment;
+            this.logger = logger;
         }
 
         // GET: api/Archivo
@@ -146,30 +154,89 @@ namespace sistema_gestion_solicitudes.Controllers
         }
 
 
+        public class ArchivoDto
+        {
+            public List<IFormFile> Files { get; set; } // Asegúrate de que el nombre de la propiedad coincida con la clave usada en el cliente
+            public List<string> Nombre { get; set; }
+            public List<int> SolicitudDetalleId { get; set; }
+            public List<string> Extension { get; set; }
+            public List<int> UsuarioId { get; set; }
+            public List<int> TipoArchivoId { get; set; }
+
+
+        }
 
         [HttpPost]
         [Route("/api/Archivos/Create")]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        public async Task<ActionResult<Archivo>> CreateArchivo(List<Archivo> archivos)
+        public async Task<IActionResult> CreateArchivo([FromForm] ArchivoDto archivoDto)
         {
             if (DBContext.Archivo == null)
             {
-                return BadRequest();
+                this.logger.LogError("DBContext.Archivo is null.");
+                return BadRequest("DBContext.Archivo is null.");
             }
 
-            foreach (Archivo file in archivos)
+            this.logger.LogInformation("PASO #1: DBContext.Archivo no es null");
+
+            try
             {
-                var newFile = new Archivo { Nombre = file.Nombre, SolicitudDetalleId = file.SolicitudDetalleId, URL = file.URL , 
-                    FechaCreacion = DateTime.Now , NumeroDescargas = 0, Extension = file.Extension, UsuarioId = file.UsuarioId, 
-                    TipoArchivoId = file.TipoArchivoId};
+                this.logger.LogWarning("files.Count: "+ archivoDto.Files.Count.ToString());
 
-                DBContext.Archivo.Add(newFile);
-                await DBContext.SaveChangesAsync();
+                for (int i = 0; i < archivoDto.Files.Count; i+=1)
+                {
+                    var file = archivoDto.Files[i];
+                    var nombre = archivoDto.Nombre[i];
+                    var SolicitudDetalleId = archivoDto.SolicitudDetalleId[i];
+                    var Extension = archivoDto.Extension[i];
+                    var UsuarioId = archivoDto.UsuarioId[i];
+                    var TipoArchivoId = archivoDto.TipoArchivoId[i];
 
+                    try
+                    {
+                        
+                        this.logger.LogWarning("files.Count: " + file);
+                        var filePath = "C:\\Users\\Ing. Juan Vera\\Documents\\Ingenieria\\Desarrollo\\Dennys\\v2\\sgscei\\sistema-gestion-solicitudes\\uploads\\" + file.FileName;
+
+                        using (var stream = System.IO.File.Create(filePath))
+                        {
+                            await file.CopyToAsync(stream);
+                        }
+
+                        var newFile = new Archivo
+                        {
+                            Nombre = nombre,
+                            SolicitudDetalleId = SolicitudDetalleId,
+                            FechaCreacion = DateTime.Now,
+                            NumeroDescargas = 0,
+                            Extension = Extension,
+                            UsuarioId= UsuarioId,
+                            TipoArchivoId= TipoArchivoId,
+                            URL= filePath
+
+                        };
+
+
+                        DBContext.Archivo.Add(newFile);
+                        await DBContext.SaveChangesAsync();
+                        this.logger.LogInformation($"Archivo procesado: {file.FileName}");
+
+                        this.logger.LogInformation($"Archivo procesado: {file.FileName}");
+                    }
+                    catch (Exception ex)
+                    {
+                        this.logger.LogError(ex, $"Error al procesar el archivo: {file.FileName}");
+                        // Considera si quieres continuar con el siguiente archivo o no
+                    }
+                }
+
+
+
+                return Ok();
+
+            }catch(Exception ex){
+                return BadRequest(ex.Message);
             }
-            return Ok();
-
-
         }
 
 

@@ -31,6 +31,8 @@ public partial class GestionContext : DbContext
 
     public virtual DbSet<User> Users { get; set; }
 
+    public virtual DbSet<InvitacionLink> InvitacionLink { get; set; }
+
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     { 

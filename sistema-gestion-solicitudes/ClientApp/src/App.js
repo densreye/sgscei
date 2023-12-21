@@ -47,7 +47,7 @@ export default class App extends Component {
 
               <Route path="/Welcome" element={<LoginPage />} />
               <Route path="/LoginExt" element={<LoginExterno />} />
-              <Route path="/Registro/:id?" element={<RegisterPage />} />
+              <Route path="/Registro/:code?" element={<RegisterPage />} />
               <Route path="/" element={<PrivateRoute><Home /></PrivateRoute>}>
                   <Route path="/Solicitudes" element={<ListaSolicitudes />} />
                   <Route path="/Solicitud/:id" element={<SolicitudControl />} />
