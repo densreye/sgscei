@@ -26,8 +26,8 @@ const FormikControl = (props) => {
             return <Select {...rest} />;
         case "textarea":
             return <TextArea {...rest} />;
-        case "file":
-            return <FileInput {...rest} />;
+        case 'file':
+            return <FileInput {...rest} accept=".pdf, application/pdf" />;
         case "datetime":
             return <DateTimePicker {...rest} />;
         case "autocomplete":

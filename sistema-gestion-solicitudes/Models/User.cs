@@ -12,6 +12,11 @@ public partial class User
 
     public string Username { get; set; } = null!;
 
+    public string universidad { get; set; } = null!;
+
+    public bool aceptoUsoApp { get; set; }
+    public bool aceptoTerminos { get; set; }
+
     public string? ContrasenaHash { get; set; } = null!;
     public int Cedula { get; set; }
     public DateTime FechaCreacion { get; set; }

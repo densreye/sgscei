@@ -5,6 +5,7 @@ using System.Text;
 using System.Security.Cryptography;
 using Microsoft.Extensions.Logging;
 using Castle.Core.Smtp;
+using Microsoft.Data.SqlClient;
 
 
 namespace sistema_gestion_solicitudes.Controllers
@@ -141,8 +142,10 @@ namespace sistema_gestion_solicitudes.Controllers
                     var rol1 = await DBContext.Roles.FirstOrDefaultAsync(r => r.Nombre == "Usuario Externo");
                     var rol2 = await DBContext.Roles.FirstOrDefaultAsync(r => r.Nombre == "Investigador");
                     var rol3 = await DBContext.Roles.FirstOrDefaultAsync(r => r.Nombre == "Miembro del Comite");
+                    var rol4 = await DBContext.Roles.FirstOrDefaultAsync(r => r.Nombre == "Presidente");
+                    var rol5 = await DBContext.Roles.FirstOrDefaultAsync(r => r.Nombre == "Secretario");
 
-                    
+
                     if (rol1 != null)
                     {
                         usuario.Roles.Add(rol1);
@@ -156,6 +159,16 @@ namespace sistema_gestion_solicitudes.Controllers
                     if (usuario.IsInvited == true && rol3 != null)
                     {
                         usuario.Roles.Add(rol3);
+                    }
+
+                    if (rol4 != null)
+                    {
+                        usuario.Roles.Add(rol4);
+                    }
+
+                    if (rol5 != null)
+                    {
+                        usuario.Roles.Add(rol5);
                     }
 
                     usuario.FechaCreacion = DateTime.Now;
@@ -179,9 +192,11 @@ namespace sistema_gestion_solicitudes.Controllers
         [Route("/api/User/{id}")]
         public async Task<IActionResult> PutSolicitud(int id, User usuario)
         {
+            this.logger.LogError("ID: "+id.ToString());
+            this.logger.LogError("usuario: ", usuario.Id);
             if (id != usuario.Id)
             {
-                return BadRequest();
+                return BadRequest("Usuario no coincide");
             }
 
             var usuarioExistente = await DBContext.Users.FirstOrDefaultAsync(u => u.Id == id);
@@ -195,8 +210,47 @@ namespace sistema_gestion_solicitudes.Controllers
             usuarioExistente.Username = usuario.Username;
             usuarioExistente.Correo = usuario.Correo;
             usuarioExistente.Cedula = usuario.Cedula;
+            usuarioExistente.universidad = usuario.universidad;
             usuarioExistente.Estado = usuario.Estado;
 
+            string deleteQuery = "DELETE FROM RoleUser WHERE UserId = "+id.ToString();
+            this.logger.LogError("deleteQuery: "+ deleteQuery);
+            await DBContext.Database.ExecuteSqlRawAsync(deleteQuery);
+
+            var rol1 = await DBContext.Roles.FirstOrDefaultAsync(r => r.Nombre == "Usuario Externo");
+            var rol2 = await DBContext.Roles.FirstOrDefaultAsync(r => r.Nombre == "Investigador");
+            var rol3 = await DBContext.Roles.FirstOrDefaultAsync(r => r.Nombre == "Miembro del Comite");
+            var rol4 = await DBContext.Roles.FirstOrDefaultAsync(r => r.Nombre == "Presidente");
+            var rol5 = await DBContext.Roles.FirstOrDefaultAsync(r => r.Nombre == "Secretario");
+
+            foreach (Role r in usuario.Roles)
+            {
+                if (rol1 != null && r.Nombre==rol1.Nombre )
+                {
+                    usuarioExistente.Roles.Add(rol1);
+                }
+
+                if (rol2 != null && r.Nombre == rol2.Nombre)
+                {
+                    usuarioExistente.Roles.Add(rol2);
+                }
+
+                if (rol3 != null && r.Nombre == rol3.Nombre)
+                {
+                    usuarioExistente.Roles.Add(rol3);
+                }
+
+                if (rol4 != null && r.Nombre == rol4.Nombre)
+                {
+                    usuarioExistente.Roles.Add(rol4);
+                }
+
+                if (rol5 != null && r.Nombre == rol5.Nombre)
+                {
+                    usuarioExistente.Roles.Add(rol5);
+                }
+            }
+            //usuarioExistente.Roles = usuario.Roles;
             try
             {
                 await DBContext.SaveChangesAsync();

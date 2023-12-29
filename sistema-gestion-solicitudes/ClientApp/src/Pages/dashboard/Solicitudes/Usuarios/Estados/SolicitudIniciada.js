@@ -10,6 +10,8 @@ import AnexosList from "../../Secciones/AnexosSection";
 import DocumentsList from "../../Secciones/DocumentosSection";
 import { API_URL } from "../../../../../Utils/Variables";
 import MessageCard from "../../../../../components/Card/MessageCard";
+import SnackbarComponent from "../../../../../components/Snackbar";
+import { useNavigate,useParams } from 'react-router-dom';
 
 const SolicitudIniciada = (props) => {
     const { solicitud, fetchData } = props;
@@ -17,6 +19,7 @@ const SolicitudIniciada = (props) => {
     const [openConfirmacion, setOpenConfirmacion] = useState(false);
     const [files, setFiles] = useState([]);
 
+    const navigate = useNavigate();
 
     const getDocumentacionByTipo = async () => {
         try {
@@ -48,6 +51,9 @@ const SolicitudIniciada = (props) => {
     }, [])
 
 
+    const [message, setMessage] = useState("");
+    const [severity, setSeverity] = useState("");
+    const [open, setOpen] = useState(false);
 
     const onSubmit = (value) => {
         console.log(value)
@@ -62,46 +68,47 @@ const SolicitudIniciada = (props) => {
     const handleEnviar = async () => {
         const formData = new FormData();
         console.log(files)
+        let len_files=files.length;
+        let count_valid=0
         for(let i = 0; i < files.length; i++) {
             let myfile=files[i]
+            let extension=myfile.name.split('.').pop();
+            if(extension=='pdf'){
+                count_valid+=1;
+            }
             formData.append("files",myfile);
             // Agregar datos adicionales al FormData
             formData.append('Nombre', myfile.name);
             formData.append('SolicitudDetalleId', solicitud.solicitudDetalle.id); // Reemplaza con el valor real
-            formData.append('Extension',  myfile.name.split('.').pop()); // Reemplaza con el valor real
+            formData.append('Extension',  extension); // Reemplaza con el valor real
             formData.append('UsuarioId', '4'); // Reemplaza con el valor real
             formData.append('TipoArchivoId', '1'); // Reemplaza con el valor real
             
         }
 
-        
+        if(count_valid==len_files){
+            try{
+                let response = await MetodosFetch.createArchivos(formData)
+                console.log('response: ',response)
+                if (response.ok) {
+                    setOpenConfirmacion(false);
+                    fetchData();
 
-
-        // files.forEach((file) => {
-        //     // Añadir el archivo al objeto FormData
-        //     formData.append('File', file);
-        //     // Añadir datos adicionales al objeto FormData
-        //     formData.append('Nombre', file.name);
-        //     formData.append('solicitudDetalleId', solicitud.solicitudDetalle.id);
-        //     formData.append('Extension', file.name.split('.').pop());
-        //     formData.append('UsuarioId', '4'); // Suponiendo que '4' es un valor fijo para el ejemplo
-        //     formData.append('TipoArchivoId', '1'); // Suponiendo que '1' es un valor fijo para el ejemplo
-        // });
-
-        try{
-            let response = await MetodosFetch.createArchivos(formData)
-            console.log('response: ',response)
-            if (response.ok) {
-                setOpenConfirmacion(false);
-                fetchData();
+                    setTimeout(()=>{
+                        navigate('/Solicitudes');
+                    },1000)
+                }
+                else {
+                    console.log('Error al subir los archivos');
+                }
+            }catch (error) {
+                console.error('Error al enviar los archivos', error);
             }
-            else {
-                console.log('Error al subir los archivos');
-            }
-        }catch (error) {
-            console.error('Error al enviar los archivos', error);
+        }else{
+            setMessage('Todos los archivos deben ser pdf')
+            setSeverity('error');
+            setOpen(true);
         }
-
     }
 
     const handleCloseConfirmacion = () => {
@@ -117,6 +124,9 @@ const SolicitudIniciada = (props) => {
     })
 
 
+    const handleCloseSnackBar = (event, reason) => {
+        setOpen(false);
+    };
 
     return (
         <>
@@ -146,6 +156,7 @@ const SolicitudIniciada = (props) => {
                                             label="Documentos"
                                             name="files"
                                             isMultiple={true}
+                                            accept=".pdf,application/pdf"
                                             files={files}
                                             setFiles={setFiles}
                                         />
@@ -184,6 +195,7 @@ const SolicitudIniciada = (props) => {
 
 
             </Box>
+            <SnackbarComponent message={message} open={open} severity={severity} onClose={handleCloseSnackBar} />
 
 
         </>

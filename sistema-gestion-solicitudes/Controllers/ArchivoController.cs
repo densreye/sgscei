@@ -196,9 +196,25 @@ namespace sistema_gestion_solicitudes.Controllers
                     {
                         
                         this.logger.LogWarning("files.Count: " + file);
-                        var filePath = "C:\\Users\\Ing. Juan Vera\\Documents\\Ingenieria\\Desarrollo\\Dennys\\v2\\sgscei\\sistema-gestion-solicitudes\\uploads\\" + file.FileName;
 
-                        using (var stream = System.IO.File.Create(filePath))
+                        var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+                        // Loguea el directorio base para verificarlo
+                        this.logger.LogWarning($"baseDirectory: {baseDirectory}");
+
+                        // Sube cuatro niveles desde el directorio base
+                        var projectDirectory = Path.GetFullPath(Path.Combine(baseDirectory, @"..\..\..\"));
+
+                        // Combina el directorio del proyecto con el path relativo al directorio 'uploads'
+                        var relativePath = Path.Combine(projectDirectory, "uploads", file.FileName);
+
+                        // Asegúrate de que la ruta esté bien formada y normalizada
+                        var normalizedRelativePath = Path.GetFullPath(new Uri(relativePath).LocalPath);
+
+                        // Loguea la ruta relativa normalizada para verificarla
+                        this.logger.LogWarning($"normalizedRelativePath: {normalizedRelativePath}");
+
+
+                        using (var stream = System.IO.File.Create(normalizedRelativePath))
                         {
                             await file.CopyToAsync(stream);
                         }
@@ -212,7 +228,7 @@ namespace sistema_gestion_solicitudes.Controllers
                             Extension = Extension,
                             UsuarioId= UsuarioId,
                             TipoArchivoId= TipoArchivoId,
-                            URL= filePath
+                            URL= normalizedRelativePath
 
                         };
 
@@ -237,6 +253,31 @@ namespace sistema_gestion_solicitudes.Controllers
             }catch(Exception ex){
                 return BadRequest(ex.Message);
             }
+        }
+
+        [HttpGet]
+        [Route("download/{filename}")]
+        public IActionResult Download(string filename)
+        {
+            var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            // Loguea el directorio base para verificarlo
+            this.logger.LogWarning($"baseDirectory: {baseDirectory}");
+
+            // Sube cuatro niveles desde el directorio base
+            var projectDirectory = Path.GetFullPath(Path.Combine(baseDirectory, @"..\..\..\"));
+
+            // Combina el directorio del proyecto con el path relativo al directorio 'uploads'
+            var relativePath = Path.Combine(projectDirectory, "uploads", filename);
+
+            
+            // Verifica si el archivo existe
+            if (!System.IO.File.Exists(relativePath))
+                return NotFound();
+
+            // Obtén el tipo de contenido para el archivo
+            var contentType = "APPLICATION/octet-stream";
+            var content = System.IO.File.ReadAllBytes(relativePath);
+            return File(content, contentType, Path.GetFileName(relativePath));
         }
 
 

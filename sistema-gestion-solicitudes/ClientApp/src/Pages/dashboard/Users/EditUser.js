@@ -1,17 +1,18 @@
-﻿import React from "react";
+﻿import React, { useState, useEffect } from "react";
 import { Formik, Form } from "formik";
 import * as yup from "yup";
 import { BtnCancel, ButtonStyled, SwitchStyled } from "../../../Utils/CustomStyles";
 import { Box, Typography,Grid } from "@mui/material"
 import FormikControl from "../../../components/Form/FormControl";
-import { useState } from 'react';
 import { API_URL } from "../../../Utils/Variables";
 import FormDialog from "../../../components/Dialog/Dialogo";
 
 const EditUser = ({ open, handleClose, handleSnackBar,data }) => {
     const [toggle, setToggle] = useState(true);
+    const [loadData, setLoadData] = useState(false);
+    const [rolesAv, updateRolesAv] = React.useState([]);
+    const [selectedRoles, setSelectedRoles] = React.useState([])
 
-    
     const initialValues = {
         id: data?.id,
         nombres: data?.nombres,
@@ -22,22 +23,88 @@ const EditUser = ({ open, handleClose, handleSnackBar,data }) => {
         roles: [],
         selectedEspecialidades: [],
         selectedRoles: [],
+        universidad: data?.universidad,
+        estado: toggle
+    };
+
+    if(loadData==false){
+        if(data!==undefined){
+            console.log('data: ',data)
+            setLoadData(true);
+            setToggle(data['estado'])
+            let formatRoles=[]
+            for (let rol of data['roles']){
+                formatRoles.push({ key: rol.id, value: rol.nombre })
+            }
+            setTimeout(()=>{
+                setSelectedRoles(formatRoles);
+            },3000)
+            
+        }
+    }
+    
+    
+
+    const fetchRole = (async () => {
+        try {
+            await fetch(API_URL + '/RolesActivos')
+                .then(response => response.json())
+                .then(data => {
+                    for (let rol of data) {
+                        updateRolesAv(rolesAv => [...rolesAv, { key: rol.id, value: rol.nombre }]);
+                        
+                    }
+                })
+            
+
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+       
+    });
+
+    const handleChangeRoles = (value) => {
+        setSelectedRoles(value)
+
         
     };
 
+    useEffect(() => {
+        console.log('useEffect')
+        fetchRole();
+        return () => {
+            updateRolesAv([])
+        };
+
+
+    }, [])
+
     const  onSubmit = async (values) => {
         console.log('go to update user')
+
+        const roles = []
+
+        values.selectedRoles.forEach((rol) => {
+            roles.push({
+                Nombre: rol.value,
+                Id: rol.key
+            })
+        })
+
         const data = JSON.stringify({
             id: values.id || 'vacio',
             nombres: values.nombres,
             apellidos: values.apellidos,
             correo: values.correo,
             username: values.username,
-            cedula: values.cedula
+            cedula: values.cedula,
+            universidad: values.universidad,
+            Roles: roles,
+            estado: toggle
         })
 
         console.log('data: ',data)
-        //handleSnackBar(true, "Usuario editado exitosamente");
+        handleSnackBar(true, "Usuario editado exitosamente");
         let res = await fetch(API_URL + `/User/${values.id}`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
@@ -71,6 +138,8 @@ const EditUser = ({ open, handleClose, handleSnackBar,data }) => {
     });
 
     const handleToggle = () => {
+        console.log('toggle: ',toggle)
+        console.log('cambiara a: ',!toggle)
         setToggle(!toggle);
     
         
@@ -78,7 +147,7 @@ const EditUser = ({ open, handleClose, handleSnackBar,data }) => {
 
     const handleResetForm = () => {
         //setSelectedEspecialidades([])
-        //setSelectedRoles([])
+        setSelectedRoles([])
         handleClose();
     }
 
@@ -151,8 +220,33 @@ const EditUser = ({ open, handleClose, handleSnackBar,data }) => {
                                             target="Forms"
                                         />
                                     </Grid>
-                               
+                                    <Grid item xs={12} sm={6}>
+                                        <FormikControl
+                                            control="input"
+                                            type="text"
+                                            label="Universidad"
+                                            name="universidad"
+                                            target="Forms"
+                                        />
+                                    </Grid>
                                 </Grid>
+                                
+                                <Grid item xs={12} sm={6}>
+
+                                                <FormikControl
+                                                    control="autocomplete"
+                                                    name="selectedRoles"
+                                                    options={rolesAv}
+                                                    label="Seleccione roles"
+                                                    selectAllLabel="Seleccionar todos"
+                                                    onSelect={handleChangeRoles}
+                                                    value={selectedRoles}
+
+
+                                                />
+
+
+                                        </Grid> 
                             </Grid>
 
                             <Grid container direction="column">

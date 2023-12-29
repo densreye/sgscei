@@ -12,10 +12,12 @@ namespace sistema_gestion_solicitudes.Controllers
     {
 
         private readonly GestionContext DBContext;
+        private readonly ILogger<ArchivoController> logger;
 
-        public SolicitudController(GestionContext DBContext)
+        public SolicitudController(GestionContext DBContext, ILogger<ArchivoController> logger)
         {
             this.DBContext = DBContext;
+            this.logger = logger;
         }
         [HttpGet]
 
@@ -28,23 +30,38 @@ namespace sistema_gestion_solicitudes.Controllers
         [Route("/api/SolicitudesByUserId/{id}")]
         public ActionResult<IEnumerable<Solicitud>> GetSolicitudesByUser(int id)
         {
-            var solicitudes = DBContext.Solicituds.OrderByDescending(s=> s.Id)
-                                                   .Where(u => u.UsuarioId == id)
-                                                   .Include(u => u.Estado)
-                                                   .Include(u=> u.Resolucion)
-                                                   .ToList();
-                          
-            if(solicitudes != null)
-            {
 
+            var usuario = DBContext.Users
+            .Include(u => u.Roles)
+            .FirstOrDefault(u => u.Id == id);
+
+            this.logger.LogInformation("Usuario encontrado: "+usuario.Id.ToString());
+            if (usuario.Roles.Any(r => r.Nombre == "Presidente" || r.Nombre == "Secretario"))
+            {
+                this.logger.LogInformation("Es presidente o secretario: ");
+                var solicitudes = DBContext.Solicituds.OrderByDescending(s => s.Id)
+                                                   .Include(u => u.Estado)
+                                                   .Include(u => u.Resolucion)
+                                                   .ToList();
                 return solicitudes;
             }
             else
             {
-                return NotFound();
-            }
+                this.logger.LogInformation("Es usuario normal: ");
+                var solicitudes = DBContext.Solicituds.OrderByDescending(s => s.Id)
+                                                   .Where(u => u.UsuarioId == id)
+                                                   .Include(u => u.Estado)
+                                                   .Include(u => u.Resolucion)
+                                                   .ToList();
+                return solicitudes;
 
+
+            }
             
+
+
+
+
         }
 
 
