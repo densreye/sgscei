@@ -241,43 +241,18 @@ const RegisterPage = () => {
                 gridTemplateAreas: `"header header header header"
                                           "main  right right right"
                                           "footer footer footer footer"`,
+
+                                          gridArea: 'main', display: 'flex',
+                                          alignItems: 'center',   
+                                          backgroundColor:'#2d3b45'                         
             }}>
-                <Grid sx={{ gridArea: 'header', bgcolor: 'primary.main' }}>
-                    <AppBar position="static">
-                        <Toolbar sx={{ backgroundColor: '#253260' }}>
-                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                <CardMedia
-                                    component="img"
-                                    image={logo}
-                                    title="logo espol"
-                                    sx={{ width: '130px' }}
-
-                                />
-                                <Box sx={{ display: 'flex', flexDirection: 'column', pl: 5 }}>
-                                    <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                                            Comité de Ética en Investigación
-                                    </Typography>
-                                </Box>
-
-
-                            </Box>
-
-
-
-                        </Toolbar>
-                    </AppBar>
-                </Grid>
-                <Box sx={{
-                    gridArea: 'main', display: 'flex',
-                    alignItems: 'center',
-
-                }}>
+               
 
                     <Grid container direction="column" justifyContent="center" alignItems="center" >
-                        <Grid item xs={12} sx={{ width: '70%', backgroundColor: "#fff", p: 2, boxShadow: 'rgba(149, 157, 165, 0.2) 0px 8px 24px;' }} >
+                        <Grid item xs={12} sx={{ width: '70%', backgroundColor: "#fff", p: 2, backgroundColor:'#2d3b45', color: 'white' }} >
                             <Grid item sx={{ m: { xs: 1, sm: 2 } }}>
-                                <Divider sx={{ mb:3 }}>
-                                    <AccountCircleIcon />
+                                <Divider  sx={{ mb:3, fontSize: '2.5rem'}}>
+                                    REGISTRO USUARIO EXTERNO
                                 </Divider>
                                 <Formik
 
@@ -285,8 +260,6 @@ const RegisterPage = () => {
                                     onSubmit={onSubmit}
                                     validationSchema={validationSchema}
                                     innerRef={formikRef} // Añade la propiedad innerRef aquí
-
-
 
                                 >
                                     {(formik) => {
@@ -301,6 +274,7 @@ const RegisterPage = () => {
                                                                 label="Nombres"
                                                                 name="nombres"
                                                                 target="Forms"
+                                                                style={{ backgroundColor: 'white', border: '1px solid grey', borderRadius: '4px', width: '90%'}}
                                                             />
                                                         </Grid>
                                                         <Grid item xs={12} sm={6}>
@@ -310,6 +284,7 @@ const RegisterPage = () => {
                                                                 label="Apellidos"
                                                                 name="apellidos"
                                                                 target="Forms"
+                                                                style={{ backgroundColor: 'white', border: '1px solid grey', borderRadius: '4px', width: '90%'}}
                                                             />
                                                         </Grid>
                                                     </Grid>
@@ -321,19 +296,10 @@ const RegisterPage = () => {
                                                                 label="Cédula"
                                                                 name="cedula"
                                                                 target="Forms"
+                                                                style={{ backgroundColor: 'white', border: '1px solid grey', borderRadius: '4px', width: '90%'}}
                                                             />
                                                         </Grid>
-                                                        <Grid item xs={12} sm={6}>
-                                                            <FormikControl
-                                                                control="input"
-                                                                type="text"
-                                                                label="Correo Electrónico"
-                                                                name="correo"
-                                                                target="Forms"
-                                                                disabled={enableDisabled}
-                                                                
-                                                            />
-                                                        </Grid>
+                                                        
                                                     </Grid>
                                                     <Grid container spacing={2}>
                                                         {/* <Grid item xs={12} sm={6}>
@@ -343,9 +309,29 @@ const RegisterPage = () => {
                                                                 label="Username"
                                                                 name="username"
                                                                 target="Forms"
+                                                                style={{ backgroundColor: 'white', border: '1px solid grey', borderRadius: '4px', width: '90%'}}
                                                             />
                                                         </Grid> */}
-                                                        
+                                                        <Grid item xs={12} sm={6}>
+                                                            <FormikControl
+                                                                control="input"
+                                                                type="text"
+                                                                label="Universidad de origen"
+                                                                name="universidad"
+                                                                target="Forms"
+                                                                style={{ backgroundColor: 'white', border: '1px solid grey', borderRadius: '4px', width: '90%'}}
+                                                            />
+                                                        </Grid>
+                                                        <Grid item xs={12} sm={6}>
+                                                            <FormikControl
+                                                                control="input"
+                                                                type="text"
+                                                                label="Correo Electrónico"
+                                                                name="correo"
+                                                                target="Forms"
+                                                                style={{ backgroundColor: 'white', border: '1px solid grey', borderRadius: '4px', width: '90%'}}
+                                                            />
+                                                        </Grid>
                                                     </Grid>
                                                     <Grid container spacing={2}>
                                                         <Grid item xs={12} sm={6}>
@@ -355,6 +341,7 @@ const RegisterPage = () => {
                                                                 label="Contraseña"
                                                                 name="contrasena"
                                                                 target="Forms"
+                                                                style={{ backgroundColor: 'white', border: '1px solid grey', borderRadius: '4px', width: '90%'}}
                                                             />
                                                         </Grid>
                                                         <Grid item xs={12} sm={6}>
@@ -364,18 +351,7 @@ const RegisterPage = () => {
                                                                 label="Confirmar contraseña"
                                                                 name="confirmacion"
                                                                 target="Forms"
-                                                            />
-                                                        </Grid>
-                                                    </Grid>
-                                                    <Grid container spacing={2}>
-                                                        
-                                                        <Grid item xs={12} sm={6}>
-                                                            <FormikControl
-                                                                control="input"
-                                                                type="text"
-                                                                label="Universidad de origen"
-                                                                name="universidad"
-                                                                target="Forms"
+                                                                style={{ backgroundColor: 'white', border: '1px solid grey', borderRadius: '4px', width: '90%'}}
                                                             />
                                                         </Grid>
                                                     </Grid>
@@ -385,7 +361,7 @@ const RegisterPage = () => {
                                                             control="checkbox"
                                                             label="acepto estoy de acuerdo con que usen mis datos en este app"
                                                             name="acepto1"
-                                                            options={[{ key: 'Acepto1', value: 'Acepto el uso de mis datos' }]} // 'options' debe ser un array de objetos con 'key' y 'value'
+                                                            options={[{ key: 'Acepto', value: 'Acepto el uso de mis datos' }]} // 'options' debe ser un array de objetos con 'key' y 'value'
                                                             />
                                                         </Grid>
                                                         <Grid item xs={12} sm={6}>
@@ -393,24 +369,20 @@ const RegisterPage = () => {
                                                             control="checkbox"
                                                             label="acepto termino y condiciones"
                                                             name="acepto2"
-                                                            options={[{ key: 'Acepto2', value: 'Acepto los terminos y condiciones' }]} // 'options' debe ser un array de objetos con 'key' y 'value'
+                                                            options={[{ key: 'Acepto', value: 'Acepto los terminos y condiciones' }]} // 'options' debe ser un array de objetos con 'key' y 'value'
                                                             />
                                                         </Grid>
                                                     </Grid>
-
                                                     <Grid container justifyContent="center" spacing={2}>
                                                         <Grid item>
-                                                            <ButtonStyled variant="contained" type="submit" sx={{ mt: 2 }}>
+                                                            <ButtonStyled variant="contained" type="submit"  sx={{ mt: 2 }} >
                                                                 Registrar
                                                             </ButtonStyled>
-                                                        </Grid>
-                                                        <Grid item>
-                                                            <ButtonStyled variant="contained" onClick={handleBack} sx={{ mt: 2 }}>
+                                                            <ButtonStyled variant="contained" onClick={handleBack} sx={{ mt: 2, ml: 5 }}>
                                                                 Volver
                                                             </ButtonStyled>
                                                         </Grid>
                                                     </Grid>
-
                                                 </Grid>
                                                 
                                             </Form>
@@ -426,23 +398,6 @@ const RegisterPage = () => {
                         </Grid>
                     </Grid>
                 </Box>
-                <Box sx={{
-                    gridArea: 'right',
-                    backgroundImage: `url(${banner})`,
-                    backgroundSize: 'cover',
-                    backgroundRepeat: 'no-repeat'
-
-                }}>
-
-
-                </Box>
-                <Box sx={{ gridArea: 'footer' }}>
-                    <Grid item xs={12}>
-                        <Footer></Footer>
-                    </Grid>
-                </Box>
-
-            </Box>
 
             <SnackbarComponent message={message} open={open} severity={severity} onClose={handleCloseSnackBar} />
 
