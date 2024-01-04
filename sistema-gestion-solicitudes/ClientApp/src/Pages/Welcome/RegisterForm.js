@@ -236,7 +236,7 @@ const RegisterPage = () => {
         <>
             <Box sx={{
                 display: 'grid',
-                height: '90vh',
+                height: '100vh',
                 gridTemplateRows: 'auto 85% 15%',
                 gridTemplateAreas: `"header header header header"
                                           "main  right right right"
@@ -244,12 +244,6 @@ const RegisterPage = () => {
             }}>
                 <Grid sx={{ gridArea: 'header', bgcolor: 'primary.main' }}>
                     <AppBar position="static">
-                    <Button 
-                        color="inherit" 
-                        sx={{ marginLeft: 'auto' }} // Esto empuja el botón a la derecha
-                    >
-                        Inicio
-                    </Button>
                         <Toolbar sx={{ backgroundColor: '#253260' }}>
                             <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                 <CardMedia
@@ -260,13 +254,8 @@ const RegisterPage = () => {
 
                                 />
                                 <Box sx={{ display: 'flex', flexDirection: 'column', pl: 5 }}>
-                                    <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>
-                                        Gestión
-
-                                    </Typography>
-                                    <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }} >
-                                        de Solicitudes
-
+                                    <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                                            Comité de Ética en Investigación
                                     </Typography>
                                 </Box>
 
@@ -362,7 +351,7 @@ const RegisterPage = () => {
                                                         <Grid item xs={12} sm={6}>
                                                             <FormikControl
                                                                 control="input"
-                                                                type="text"
+                                                                type="password"
                                                                 label="Contraseña"
                                                                 name="contrasena"
                                                                 target="Forms"
@@ -371,7 +360,7 @@ const RegisterPage = () => {
                                                         <Grid item xs={12} sm={6}>
                                                             <FormikControl
                                                                 control="input"
-                                                                type="text"
+                                                                type="password"
                                                                 label="Confirmar contraseña"
                                                                 name="confirmacion"
                                                                 target="Forms"
@@ -396,7 +385,7 @@ const RegisterPage = () => {
                                                             control="checkbox"
                                                             label="acepto estoy de acuerdo con que usen mis datos en este app"
                                                             name="acepto1"
-                                                            options={[{ key: 'Acepto', value: 'Acepto el uso de mis datos' }]} // 'options' debe ser un array de objetos con 'key' y 'value'
+                                                            options={[{ key: 'Acepto1', value: 'Acepto el uso de mis datos' }]} // 'options' debe ser un array de objetos con 'key' y 'value'
                                                             />
                                                         </Grid>
                                                         <Grid item xs={12} sm={6}>
@@ -404,7 +393,7 @@ const RegisterPage = () => {
                                                             control="checkbox"
                                                             label="acepto termino y condiciones"
                                                             name="acepto2"
-                                                            options={[{ key: 'Acepto', value: 'Acepto los terminos y condiciones' }]} // 'options' debe ser un array de objetos con 'key' y 'value'
+                                                            options={[{ key: 'Acepto2', value: 'Acepto los terminos y condiciones' }]} // 'options' debe ser un array de objetos con 'key' y 'value'
                                                             />
                                                         </Grid>
                                                     </Grid>

@@ -92,72 +92,51 @@ const LoginPage = () => {
         <>
             <Box sx={{
                 display: 'grid',
-                height: '90vh',
-                gridTemplateRows: 'auto 85% 15%',
+                height: '100vh',
+                gridTemplateRows: 'auto 50% 15%',
                 gridTemplateAreas: `"header header header header"
                                           "main  right right right"
-                                          "footer footer footer footer"`,
+                                          `,
+                gridArea: 'main', display: 'flex',
+                alignItems: 'center',    
+                backgroundColor:'#2d3b45'              
             }}>
 
-
-                <Grid sx={{ gridArea: 'header', bgcolor: 'primary.main' }}>
-                    <AppBar position="static">
-                        <Toolbar sx={{ backgroundColor: '#253260' }}>
-                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                <CardMedia
-                                    component="img"
-                                    image={logo}
-                                    title="logo espol"
-                                    sx={{ width: '130px' }}
-
-                                />
-                                <Box sx={{ display: 'flex', flexDirection: 'column', pl: 5 }}>
-                                    <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>
-                                        Gestión
-
-                                    </Typography>
-                                    <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }} >
-                                        de Solicitudes
-
-                                    </Typography>
-                                </Box>
-
-
-                            </Box>
-
-
-
-                        </Toolbar>
-                    </AppBar>
-                </Grid>
-                <Box sx={{
-                    gridArea: 'main', display: 'flex',
-                    alignItems: 'center', 
-                   
-                }}>
+           
+               
 
                     <Grid container direction="column" justifyContent="center" alignItems="center" >
-                        <Grid item xs={12} sx={{ width: '50%', backgroundColor: "#fff", p: 2, boxShadow:'rgba(149, 157, 165, 0.2) 0px 8px 24px;'}} >
-                            <Grid item sx={{ m: { xs: 1, sm: 3 }, mb: 0 }}>
-                                <Divider>
-                                    <AccountCircleIcon />
-                                </Divider>
+                        
+                        <Grid item xs={12} sx={{ width: '100%', backgroundColor: "#fff", p: 2, backgroundColor:'#2d3b45'}} >
+                            
+                            <Grid item sx={{ m: {xs: 1, sm: 2  } }}>
+                                
+                                
                                 <Formik
                                         initialValues={initialValues}
                                         onSubmit={onSubmit}
                                         validationSchema={validationSchema}
 
                                     >
+                                        
                                         {(formik) => {
                                         return (
-                                            <Box sx={{ display: 'flex', justifyContent: 'center', p:3 }}>
+                                            
+                                            <Box sx={{ display: 'flex', justifyContent: 'center', p:3, color: 'white'}}>
+                                                    
+                                                    
                                                     <Form>   
+                                                        <Divider  sx={{ mb:3, fontSize: '2.5rem'}}>
+                                                            INICIO SESIÓN USUARIO EXTERNO
+                                                        </Divider>
+
                                                         <FormikControl
                                                             control="input"
                                                             type="text"
                                                             label="Correo Electrónico"
                                                             name="correo"
                                                             target="Forms"
+                                                            style={{ backgroundColor: 'white', border: '1px solid grey', borderRadius: '4px', width: '100%' }}
                                                         />
 
                                                         <FormikControl
@@ -166,16 +145,19 @@ const LoginPage = () => {
                                                             label="Contraseña"
                                                             name="contrasena"
                                                             target="Forms"
+                                                            style={{ backgroundColor: 'white', border: '1px solid grey', borderRadius: '4px' , width: '100%' }}
                                                     />
 
-                                                    <Box sx={{ display: "flex", flexDirection: "column" , pr: 3 }} >
-                                                        <ButtonStyled variant="contained" type="submit" sx={{ mt: 2, width: '100%' }} >
+                                                    <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", pr: 3}} >
+                                                        <ButtonStyled variant="contained" type="submit" sx={{ mt: 2, width: '40%', backgroundColor: '#2d3b45', border: '2.5px solid white' }} >
                                                                 Iniciar Sesión
                                                         </ButtonStyled>
 
+                                                        <ButtonStyled variant="contained" component={Link} to="/Welcome" sx={{ mt: 2, width: '40%', backgroundColor: '#2d3b45', border: '2.5px solid white' }} >
+                                                                Salir
+                                                        </ButtonStyled>
                                                         
-                                                        
-                                                        <Typography sx={{ mt: 1, color: 'Denim' ,}} component={Link} to="/Registro" variant="subtitle2">
+                                                        <Typography sx={{ mt: 1, textDecoration: 'underline',  color: 'white' }} component={Link} to="/Registro" variant="subtitle2">
                                                             Crear cuenta
                                                         </Typography>
                                                        
@@ -195,41 +177,6 @@ const LoginPage = () => {
                         </Grid>
                     </Grid>
                 </Box>
-                <Box sx={{
-                    gridArea: 'right', 
-                    backgroundImage: `url(${banner})`,
-                    backgroundSize: 'cover',
-                    backgroundRepeat: 'no-repeat'
-
-                }}>
-
-                    
-                </Box>
-                <Box sx={{ gridArea: 'footer' }}>
-                    <Grid item xs={12}>
-                        <Footer></Footer>
-                    </Grid>
-                </Box>
-
-            </Box>
-
-            <Snackbar 
-    open={openSnackbar} 
-    autoHideDuration={6000} 
-    onClose={() => setOpenSnackbar(false)}
-    anchorOrigin={{ vertical: 'bottom', horizontal: 'letf' }}
->
-    <Alert 
-        onClose={() => setOpenSnackbar(false)} 
-        severity={alertSeverity} 
-        sx={{ 
-            width: '100%', 
-            maxWidth: '500px', // Ajusta este valor para cambiar el ancho del Alert
-        }}
-    >
-        {alertMessage}
-    </Alert>
-</Snackbar>
 
 
         </>

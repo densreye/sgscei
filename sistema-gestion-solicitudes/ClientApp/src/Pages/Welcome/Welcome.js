@@ -20,7 +20,7 @@ const LoginPage = () => {
             <>
                 <Box sx={{
                     display: 'grid',
-                    height: '90vh',
+                    height: '100vh',
                     gridTemplateRows: 'auto 85% 15%',
                     gridTemplateAreas: `"header header header header"
                                           "main main main main"
@@ -40,13 +40,8 @@ const LoginPage = () => {
 
                                     />
                                     <Box sx={{ display: 'flex' , flexDirection:'column', pl:5}}>
-                                        <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>
-                                            Gestión
-
-                                        </Typography>
-                                        <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }} >
-                                            de Solicitudes
-
+                                        <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                                            Comité de Ética en Investigación
                                         </Typography>
                                     </Box>
                                     
