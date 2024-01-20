@@ -10,11 +10,11 @@ public class EmailSender : IEmailSender
         {
             EnableSsl = true,
             UseDefaultCredentials = false,
-            Credentials = new NetworkCredential("dennys_r1904@hotmail.com", "S804K;r0HR9n")
+            Credentials = new NetworkCredential("cei_prueba@outlook.com", "Ceitest123*")
         };
 
         return client.SendMailAsync(
-            new MailMessage(from: "dennys_r1904@hotmail.com",
+            new MailMessage(from: "cei_prueba@outlook.com",
                             to: email,
                             subject,
                             message
