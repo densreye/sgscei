@@ -21,6 +21,7 @@ import LoginExterno from './Pages/Welcome/LoginExterno';
 import SolicitudControl from './Pages/dashboard/Solicitudes/SolicitudControl';
 import RegisterPage from './Pages/Welcome/RegisterForm';
 import PlazosEntrega from './Pages/dashboard/PlazosEntrega';
+import Notificaciones from './Pages/dashboard/Notificaciones/Notificaciones';
 
 
 
@@ -53,6 +54,7 @@ export default class App extends Component {
                   <Route path="/Solicitud/:id" element={<SolicitudControl />} />
                   <Route path="/Usuarios" element={<Usuario />} />
                   <Route path="/Roles" element={<Roles />} />
+                  <Route path="/Notificaciones" element={<Notificaciones />} />
                   <Route path="/Especialidades" element={<Especialidades />} />
                   <Route path="/Permisos" element={<Permisos />} />
                   <Route path="/PlazosSolicitudes" element={<PlazosEntrega />} />

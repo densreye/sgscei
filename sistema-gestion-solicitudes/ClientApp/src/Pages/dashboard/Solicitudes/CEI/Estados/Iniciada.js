@@ -9,6 +9,8 @@ import * as yup from "yup";
 import MetodosFetch from "../../../../../Servicios/MetodosFetch";
 import AnexosList from "../../Secciones/AnexosSection";
 import DocumentsList from "../../Secciones/DocumentosSection";
+import Swal from 'sweetalert2'
+
 
 
 const VistaIniciada = (props) => {
@@ -19,6 +21,9 @@ const VistaIniciada = (props) => {
     const [anexosPorCompletar, setAnexosPorCompletar] = useState([])
     const [otros, setOtros] = useState(() => solicitud.solicitudDetalle.otrosArchivos ? 'Si' : 'No');
     const [descripcionArchivos, setDescripcionArchivos] = useState(solicitud.solicitudDetalle.archivosSolicitados);
+    const [message, setMessage] = useState("");
+    const [severity, setSeverity] = useState("");
+    const [open, setOpen] = useState(false);
 
 
   
@@ -104,6 +109,43 @@ const VistaIniciada = (props) => {
     }
 
 
+    const notificarAnexos= async(otrosAnexos)=>{
+        console.log('click notificarAnexos')
+        const user = localStorage.getItem('userEspol');
+        const objUser= JSON.parse(user)
+
+        const bodyData={
+            'Envia': JSON.stringify(objUser.userId),
+            'Mensaje': 'Estimado investigador se requiere: '+otrosAnexos,
+            'SolicitudId': solicitud.id
+        }
+
+        console.log('bodyData: ',bodyData)
+
+        let res = await fetch(API_URL + "/notificaciones/nuevo", {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(bodyData)
+        })
+
+        const Toast = Swal.mixin({
+            toast: true,
+            position: "top-end",
+            showConfirmButton: false,
+            timer: 4000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+              toast.onmouseenter = Swal.stopTimer;
+              toast.onmouseleave = Swal.resumeTimer;
+            }
+          });
+          Toast.fire({
+            icon: "success",
+            title: "Investigador ha sido notificado"
+          });
+
+        
+    }
 
     const initialValues = {
         anexos: [],
@@ -128,10 +170,8 @@ const VistaIniciada = (props) => {
     })
 
 
-    const onSubmit = async (values) => {
-        updateDetalles(values)
-      
-        
+    const onSubmit = async (values, { resetForm }) => {
+        updateDetalles(values)  
     };
 
     const addAnexos = async (indexAnexos) => {
@@ -158,9 +198,11 @@ const VistaIniciada = (props) => {
 
     const updateDetalles = async (values) => {
 
+        
         if (values.otros === 'Si') {
             solicitud.solicitudDetalle.otrosArchivos = true;
             solicitud.solicitudDetalle.archivosSolicitados = values.textOtros
+            notificarAnexos(values.textOtros)
         }
         else {
             solicitud.solicitudDetalle.otrosArchivos = false;
@@ -240,8 +282,9 @@ const VistaIniciada = (props) => {
 
 
                                         <Box sx={{ display: "flex", justifyContent: "space-around", mt: 5 }} >
+                                        
                                             <ButtonStyled variant="contained" type="submit"  >
-                                                Enviar
+                                                Enviar y notificar
                                             </ButtonStyled>
                                             <ButtonStyled variant="contained" type="button" onClick={() => setOpenConfirmacion(true)}>
                                                 Siguiente Etapa

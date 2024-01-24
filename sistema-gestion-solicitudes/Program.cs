@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MySql.EntityFrameworkCore.Extensions;
+using sistema_gestion_solicitude;
 using sistema_gestion_solicitudes;
 using sistema_gestion_solicitudes.Models;
 
@@ -21,6 +22,9 @@ builder.Services.AddEntityFrameworkMySQL().AddDbContext<GestionContext>(options 
 {
         options.UseMySQL(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+
+
+builder.Services.AddHostedService<TareaAutomatica>();
 
 
 builder.Services.AddCors(options =>

@@ -74,7 +74,14 @@ export const SidebarData = [
         path: '/PlazosSolicitudes',
         icon: <TimerIcon sx={{ color: 'white' }} />
 
-    }
+    },
+    {
+        id: 9,
+        titulo: 'Notificaciones',
+        path: '/Notificaciones',
+        icon: <BadgeIcon sx={{ color: 'white' }} />
+
+    },
 
 
 ]
@@ -87,11 +94,13 @@ export const useSidebarData = () => {
       const roles = getUserRoles();
       console.log('roles: ',roles)
       let filteredData;
+
+      console.log('SidebarData: ',SidebarData)
         
       if (roles.indexOf('Investigador')!=-1) {
         console.log('IF')
         // Solo mostrar 'Inicio' y 'Solicitudes' para el rol 'Investigador'
-        filteredData = SidebarData.filter(item => item.titulo === 'Inicio' || item.titulo === 'Solicitudes');
+        filteredData = SidebarData.filter(item => item.titulo === 'Inicio' || item.titulo === 'Solicitudes' || item.titulo === 'Notificaciones');
       } else {
         // Aquí puedes manejar otros roles y decidir qué mostrar
         filteredData = SidebarData;
